@@ -1,0 +1,7 @@
+{
+  "normal_small": {"score": 15},
+  "high_concurrency": {"score": 30},
+  "partial_failure_retry": {"score": 15},
+  "race_prone": {"score": 30},
+  "malformed_input": {"score": 0}
+}
