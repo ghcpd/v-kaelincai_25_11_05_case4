@@ -1,0 +1,32 @@
+[
+  {
+    "name": "normal",
+    "submission": {"submission_id":"sub_norm","answers":[{"q":"1","ans":"A"},{"q":"2","ans":"B"}]},
+    "config": {"num_scorers":3,"latency":[0.01,0.02],"fail_prob":0},
+    "expected": {"deterministic":true}
+  },
+  {
+    "name": "high_concurrency",
+    "submission": {"submission_id":"sub_conc","answers":[{"q":"1","ans":"A"},{"q":"2","ans":"B"},{"q":"3","ans":"C"}]},
+    "config": {"num_scorers":5,"latency":[0.01,0.2],"fail_prob":0.2},
+    "expected": {"deterministic":false}
+  },
+  {
+    "name": "partial_failure",
+    "submission": {"submission_id":"sub_partial","answers":[{"q":"1","ans":"A"}]},
+    "config": {"num_scorers":3,"latency":[0.05,0.1],"fail_prob":0.6},
+    "expected": {"deterministic":false}
+  },
+  {
+    "name": "race_prone",
+    "submission": {"submission_id":"sub_race","answers":[{"q":"1","ans":"A"},{"q":"2","ans":"D"}]},
+    "config": {"num_scorers":4,"latency":[0.0,0.3],"fail_prob":0.2},
+    "expected": {"deterministic":false}
+  },
+  {
+    "name": "malformed",
+    "submission": {"submission_id":"sub_bad","answers":[{"q":"1","ans":123}]},
+    "config": {"num_scorers":2,"latency":[0.01,0.01],"fail_prob":0},
+    "expected": {"deterministic":true}
+  }
+]
