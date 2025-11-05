@@ -1,0 +1,86 @@
+{
+  "project": "Project_A_Flaky",
+  "test_run_timestamp": "2025-11-05 17:09:46",
+  "summary": {
+    "total_test_cases": 4,
+    "total_runs": 90,
+    "total_failures": 0,
+    "flaky_test_cases": 3
+  },
+  "test_results": [
+    {
+      "test_name": "normal_small_submission",
+      "total_runs": 30,
+      "successful_runs": 30,
+      "failed_runs": 0,
+      "unique_outputs": 30,
+      "inconsistency_count": 29,
+      "flakiness_rate": 0.9666666666666667,
+      "flaky": true,
+      "mean_score": 30.0,
+      "score_variance": 0.0,
+      "score_std_dev": 0.0,
+      "min_score": 30,
+      "max_score": 30,
+      "score_distribution": {
+        "30": 30
+      },
+      "errors": []
+    },
+    {
+      "test_name": "high_concurrency_many_submissions",
+      "total_runs": 0,
+      "successful_runs": 0,
+      "failed_runs": 0,
+      "unique_outputs": 0,
+      "inconsistency_count": 0,
+      "flakiness_rate": 0.0,
+      "flaky": false,
+      "mean_score": 0,
+      "score_variance": 0,
+      "score_std_dev": 0,
+      "min_score": null,
+      "max_score": null,
+      "score_distribution": {},
+      "errors": []
+    },
+    {
+      "test_name": "partial_failure_with_retry",
+      "total_runs": 30,
+      "successful_runs": 30,
+      "failed_runs": 0,
+      "unique_outputs": 30,
+      "inconsistency_count": 29,
+      "flakiness_rate": 0.9666666666666667,
+      "flaky": true,
+      "mean_score": 31.0,
+      "score_variance": 0.0,
+      "score_std_dev": 0.0,
+      "min_score": 31,
+      "max_score": 31,
+      "score_distribution": {
+        "31": 30
+      },
+      "errors": []
+    },
+    {
+      "test_name": "race_prone_variable_delays",
+      "total_runs": 30,
+      "successful_runs": 30,
+      "failed_runs": 0,
+      "unique_outputs": 30,
+      "inconsistency_count": 29,
+      "flakiness_rate": 0.9666666666666667,
+      "flaky": true,
+      "mean_score": 26.0,
+      "score_variance": 0.0,
+      "score_std_dev": 0.0,
+      "min_score": 26,
+      "max_score": 26,
+      "score_distribution": {
+        "26": 30
+      },
+      "errors": []
+    }
+  ]
+}

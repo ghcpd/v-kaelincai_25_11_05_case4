@@ -1,0 +1,142 @@
+{
+  "test_cases": [
+    {
+      "name": "normal_small_submission",
+      "description": "Small submission with 3 questions, fast scoring",
+      "submission": {
+        "submission_id": "sub_normal_001",
+        "student_id": "student_001",
+        "exam_id": "exam_001",
+        "answers": [
+          {
+            "question_id": "q_1",
+            "answer": "The answer to the first question"
+          },
+          {
+            "question_id": "q_2",
+            "answer": "My second answer here"
+          },
+          {
+            "question_id": "q_3",
+            "answer": "Third answer with more detail about the topic"
+          }
+        ]
+      },
+      "scorer_config": {
+        "q_1": {"mean_latency_ms": 30, "latency_variance_ms": 10, "failure_rate": 0.0},
+        "q_2": {"mean_latency_ms": 30, "latency_variance_ms": 10, "failure_rate": 0.0},
+        "q_3": {"mean_latency_ms": 30, "latency_variance_ms": 10, "failure_rate": 0.0}
+      },
+      "expected_score_range": [7, 10],
+      "repeat_count": 30,
+      "description_detail": "Tests basic functionality with minimal variance. Provides baseline."
+    },
+    {
+      "name": "high_concurrency_many_submissions",
+      "description": "Many concurrent submissions each with multiple questions",
+      "submission_template": {
+        "exam_id": "exam_001",
+        "submission_count": 10,
+        "answers_per_submission": 5,
+        "question_pool": ["q_1", "q_2", "q_3", "q_4", "q_5"]
+      },
+      "scorer_config": {
+        "q_1": {"mean_latency_ms": 50, "latency_variance_ms": 40, "failure_rate": 0.05},
+        "q_2": {"mean_latency_ms": 60, "latency_variance_ms": 35, "failure_rate": 0.05},
+        "q_3": {"mean_latency_ms": 45, "latency_variance_ms": 50, "failure_rate": 0.05},
+        "q_4": {"mean_latency_ms": 70, "latency_variance_ms": 30, "failure_rate": 0.05},
+        "q_5": {"mean_latency_ms": 40, "latency_variance_ms": 45, "failure_rate": 0.05}
+      },
+      "repeat_count": 30,
+      "description_detail": "Tests robustness under concurrent load with variable latencies. Should show high flakiness in Project A."
+    },
+    {
+      "name": "partial_failure_with_retry",
+      "description": "Some scorers fail initially, requiring retries",
+      "submission": {
+        "submission_id": "sub_retry_001",
+        "student_id": "student_002",
+        "exam_id": "exam_001",
+        "answers": [
+          {
+            "question_id": "q_1",
+            "answer": "Answer one"
+          },
+          {
+            "question_id": "q_2",
+            "answer": "Answer two with more details"
+          },
+          {
+            "question_id": "q_3",
+            "answer": "Answer three"
+          },
+          {
+            "question_id": "q_4",
+            "answer": "Answer four is longer and more detailed"
+          }
+        ]
+      },
+      "scorer_config": {
+        "q_1": {"mean_latency_ms": 50, "latency_variance_ms": 30, "failure_rate": 0.3},
+        "q_2": {"mean_latency_ms": 50, "latency_variance_ms": 30, "failure_rate": 0.3},
+        "q_3": {"mean_latency_ms": 50, "latency_variance_ms": 30, "failure_rate": 0.3},
+        "q_4": {"mean_latency_ms": 50, "latency_variance_ms": 30, "failure_rate": 0.3}
+      },
+      "repeat_count": 30,
+      "description_detail": "Tests retry logic with 30% failure rate. Late retries can overwrite earlier successful scores, causing flakiness."
+    },
+    {
+      "name": "race_prone_variable_delays",
+      "description": "Intentionally variable latencies to trigger out-of-order completions",
+      "submission": {
+        "submission_id": "sub_race_001",
+        "student_id": "student_003",
+        "exam_id": "exam_001",
+        "answers": [
+          {
+            "question_id": "q_fast",
+            "answer": "Quick answer"
+          },
+          {
+            "question_id": "q_slow",
+            "answer": "This answer will be scored slowly"
+          },
+          {
+            "question_id": "q_medium",
+            "answer": "Medium speed response"
+          }
+        ]
+      },
+      "scorer_config": {
+        "q_fast": {"mean_latency_ms": 10, "latency_variance_ms": 5, "failure_rate": 0.0},
+        "q_slow": {"mean_latency_ms": 200, "latency_variance_ms": 100, "failure_rate": 0.0},
+        "q_medium": {"mean_latency_ms": 50, "latency_variance_ms": 30, "failure_rate": 0.0}
+      },
+      "repeat_count": 30,
+      "description_detail": "Variable latencies guarantee out-of-order completions. Tests if aggregation respects submission order."
+    },
+    {
+      "name": "malformed_edge_inputs",
+      "description": "Edge cases: missing fields, empty answers, special characters",
+      "test_cases": [
+        {
+          "submission_id": "sub_edge_001",
+          "answers": [
+            {"question_id": "q_1", "answer": ""},
+            {"question_id": "q_2", "answer": null}
+          ]
+        },
+        {
+          "submission_id": "sub_edge_002",
+          "answers": [
+            {"question_id": "q_1", "answer": "x"},
+            {"question_id": "q_missing_scorer"}
+          ]
+        }
+      ],
+      "scorer_config": {},
+      "repeat_count": 1,
+      "description_detail": "Tests robustness with malformed/missing inputs and edge cases."
+    }
+  ]
+}
