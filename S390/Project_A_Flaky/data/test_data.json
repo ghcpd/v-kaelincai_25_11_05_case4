@@ -1,0 +1,42 @@
+[
+  {
+    "id": "normal_small",
+    "description": "Small submission, prompt responses",
+    "input": {"submission_id": "sub-normal-1", "answers": [{"q":"1","ans":"A"}, {"q":"2","ans":"B"}, {"q":"3","ans":"C"}]},
+    "scorer_config": {"MIN_DELAY_MS": 10, "MAX_DELAY_MS": 30, "FAIL_RATE": 0.0, "JITTER":0},
+    "expected": {"score": 15},
+    "criteria": "identical outputs across repeated runs"
+  },
+  {
+    "id": "high_concurrency",
+    "description": "Many submissions in parallel",
+    "input": {"submission_id": "sub-conc-1", "answers": [{"q":"1","ans":"A"}, {"q":"2","ans":"A"}, {"q":"3","ans":"B"}, {"q":"4","ans":"B"}]},
+    "scorer_config": {"MIN_DELAY_MS": 10, "MAX_DELAY_MS": 200, "FAIL_RATE": 0.05, "JITTER":0},
+    "expected": {"score": 30},
+    "criteria": "identical outputs across repeated runs"
+  },
+  {
+    "id": "partial_failure_retry",
+    "description": "Some scorer calls timeout and are retried",
+    "input": {"submission_id": "sub-retry-1", "answers": [{"q":"1","ans":"A"}, {"q":"2","ans":"B"}, {"q":"3","ans":"C"}]},
+    "scorer_config": {"MIN_DELAY_MS": 10, "MAX_DELAY_MS": 400, "FAIL_RATE": 0.3, "JITTER":0},
+    "expected": {"score": 15},
+    "criteria": "identical outputs across repeated runs where retries don't cause duplicates"
+  },
+  {
+    "id": "race_prone",
+    "description": "Variable delays cause out-of-order completions",
+    "input": {"submission_id": "sub-race-1", "answers": [{"q":"1","ans":"A"}, {"q":"2","ans":"B"}, {"q":"3","ans":"A"}]},
+    "scorer_config": {"MIN_DELAY_MS": 10, "MAX_DELAY_MS": 600, "FAIL_RATE": 0.0, "JITTER":0},
+    "expected": {"score": 30},
+    "criteria": "identical outputs across repeated runs"
+  },
+  {
+    "id": "malformed_input",
+    "description": "Missing fields and unexpected answer formats",
+    "input": {"submission_id": "sub-malformed-1", "answers": [{"q":"1","ans": 1}, {"q":"2"}]},
+    "scorer_config": {"MIN_DELAY_MS": 10, "MAX_DELAY_MS": 200, "FAIL_RATE": 0.1, "JITTER":0},
+    "expected": {"score": 0},
+    "criteria": "system handles malformed input gracefully (scores 0 or rejects)"
+  }
+]
