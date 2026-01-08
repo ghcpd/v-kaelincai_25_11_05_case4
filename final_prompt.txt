@@ -1,0 +1,98 @@
+Role
+You are a software engineer responsible for implementing and testing the capabilities of AI models on the Flaky behavior subtype within the Bug-related category.
+Your task is to provide two separate, complete Python projects:
+1.	Project A – Pre-Fix (Flaky / Non-Deterministic Implementation)
+A project that contains the original, flaky implementation that demonstrates non-deterministic behavior for identical inputs (for example: an exam-grading service where repeated submissions of the same answers sometimes yield different scores due to asynchronous API ordering, race conditions, timeouts and retries).
+2.	Project B – Post-Fix (Deterministic / Corrected Implementation)
+A project that contains the corrected implementation which eliminates the non-determinism (for example: deterministic aggregation of asynchronous results, idempotent retries, ordering guarantees, proper timeout/backoff, and atomic commit of per-question scores), ensuring identical inputs always produce identical outputs under tested conditions.
+Each project must include its own code, environment setup, test cases, and execution scripts. You must ensure that all files are generated, stored locally, and fully reproducible. Both projects should handle optimizations, edge cases, and correctness verification while providing measurable improvements in determinism, stability, and performance.
+________________________________________
+Title
+Evaluation of GPT-5-Codex, GPT-5, Claude Sonnet 4.5, S100, and S40 on Bug-related – Flaky Behavior Detection and Mitigation
+________________________________________
+Description
+This experiment evaluates AI models’ ability to detect, reproduce, and fix Flaky behavior defects — nondeterministic outcomes caused by concurrency, asynchronous calls, race conditions, or inconsistent retries. The canonical scenario: an online exam grading pipeline where identical answer sets sometimes yield inconsistent total scores due to unordered/overlapping asynchronous scoring requests, retries overwriting results, or race conditions in aggregation. The objective is to reproduce flakiness, identify root causes, implement deterministic handling (ordering, idempotency, atomic aggregation), and demonstrate via automated tests and metrics that Project B removes flakiness while maintaining performance.
+Key focus areas: reliable reproduction of flaky failures, deterministic design and fixes, measurable reduction of output variance, robust tests for concurrency and retry scenarios, reproducible environment, and quantitative proof (flakiness rate, variance, correctness rate) that Project B eliminates the nondeterminism observed in Project A.
+________________________________________
+Key Evaluation Criteria
+• Ability to reproduce flaky behavior reliably in Project A.
+• Correctness of fixes in Project B (identical inputs → identical outputs across repeated runs).
+• Reduction in flakiness metrics: flakiness rate, score variance, inconsistency count.
+• Efficiency and minimal performance regression (latency, throughput).
+• Handling of edge cases: timeouts, retries, partial failures, malformed inputs, high concurrency.
+• Comprehensive automated tests that stress concurrency and retries.
+• Fully reproducible workflow with one-command execution and quantitative comparison.
+________________________________________
+Requirements for the AI Model Output
+1.	Test Scenario & Description
+o	Clearly describe the flaky scenario and the specific ability being tested (e.g., asynchronous per-question scoring calls that may complete out-of-order or time out, causing different final aggregates).
+o	Specify old (faulty) behavior: same input sometimes produces different outputs (examples: outputs 95 or 80 for same answers), explain failure modes (race, overwrite on retry, missing aggregation locking).
+o	Specify corrected behavior: deterministic aggregation (e.g., sequence numbers, idempotent updates, result locking or use of a reduce step that is order-insensitive), consistent retries with idempotency keys, and explicit timeouts/backoff.
+o	Provide expected input and output formats (preferably JSON). Example input: {"submission_id":"sub123","answers":[{"q":"1","ans":"B"},...]}. Expected output: {"submission_id":"sub123","score":95,"breakdown":[...]} identical across repeated runs.
+o	Define acceptance criteria: repeated runs (N≥30) of the same test vector produce identical outputs (zero variance) in Project B and show significantly lower flakiness metrics than Project A.
+2.	Test Data Generation
+o	Create at least five structured test cases (saveable in test_data.json) covering:
+• Normal cases — small submission, all scoring services respond promptly.
+• High-concurrency cases — many simultaneous submissions and multiple parallel scoring requests per submission.
+• Partial-failure / retry cases — some scoring services timeout and are retried, sometimes returning delayed responses.
+• Race-prone cases — intentionally introduce variable delays so out-of-order completions occur.
+• Malformed/edge inputs — missing fields, non-string answers, extreme answer sizes.
+o	For each test case include: input payload, simulated asynchronous scoring behavior (service latency distributions, failure/retry patterns), expected output, and pass/fail criteria (deterministic outputs across repeated runs).
+3.	Reproducible Environment
+o	Provide requirements.txt and setup.sh or a Dockerfile to create an environment that runs the grading service(s), simulated downstream scorer mocks, and the test harness.
+o	Include instructions to configure simulated latency/failure parameters (e.g., using environment variables to set per-scorer mean/variance, retry behavior, and concurrency levels).
+o	If external services (message queues, caches) are used, provide lightweight in-process mocks or dockerized test equivalents (e.g., Redis/SQLite mocks).
+4.	Test Code
+o	Generate executable Python test scripts that:
+a. Launch the system under test (Project A or B) and scoring-service mocks configured per test vector.
+b. Submit identical test inputs multiple times (repeat runs N times per vector) and/or concurrently submit multiple identical requests.
+c. Capture outputs, timestamps, request/response traces, and mock scorer logs.
+d. Compare outputs across repeated runs to compute flakiness metrics: inconsistency_count, flakiness_rate = (#cases with non-identical outputs)/(#total runs), score_variance, distribution of per-question differences.
+e. Assert expected behavior (e.g., Project B flakiness_rate ≤ threshold, Project A exhibits flakiness).
+f. Produce machine-readable results (results_pre.json, results_post.json) and human-readable logs.
+o	Tests must automate stress and repeatability; provide a repeat parameter (N) and random seeds to allow deterministic simulation control.
+5.	Execution Scripts
+o	Provide run_pre.sh / run_post.sh (or run_buggy.sh / run_fixed.sh) in each project to: set up env, start service and mocks with configured latency/failure profiles, run tests (including repeated runs), stop services, and collect logs/performance data.
+o	Provide a top-level run_all.sh that: builds/starts containers or venvs, runs Project A tests, runs Project B tests, aggregates results_pre.json and results_post.json, and generates compare_report.md.
+o	Ensure a single command runs the entire workflow and produces artifacts.
+6.	Expected Output
+o	For each test case provide reference outputs and expected flakiness behavior: Project A should show measurable flakiness (non-zero flakiness_rate, score variance), Project B should show determinism (flakiness_rate→0 or below threshold).
+o	Provide expected server-side artifacts: request traces, per-scorer logs, retry events with idempotency keys, timestamps, and aggregation logs.
+o	Generate metrics summary comparing pre/post: inconsistency_count, flakiness_rate, score_variance, avg_latency_before, avg_latency_after, retry_counts, and throughput. Include confidence intervals where applicable.
+7.	Documentation / Explanation
+o	Provide a README.md that explains how to reproduce the experiment, how to run pre-fix and post-fix tests, how to configure mock scoring behaviors, and where to find logs and reports.
+o	For each test case explain what it exercises (concurrency, retry, out-of-order completion, malformed input) and why it matters.
+o	Highlight pitfalls and root-cause analysis patterns (e.g., lost idempotency keys, overwrites on late responses, lack of transactional aggregation).
+o	State limitations of the mitigation (for example: if external scorer services are truly non-idempotent and cannot be changed, mitigation may require different architectural patterns such as versioned results or consensus) and recommended operational mitigations (strong idempotency, centralized aggregator, sequencing, per-question locks or committable transactions, bounded retries and backoff).
+________________________________________
+Deliverables (All must be saved as local files and organized into two project folders plus shared artifacts)
+Project A – Pre-Fix (Flaky Implementation) — folder name: Project_A_Flaky
+• src/ — flaky grading pipeline implementation (e.g., grading_service.py) that issues asynchronous scoring requests and aggregates results with race-prone logic.
+• mocks/ — scorer service mocks capable of configurable delays, intermittent failures, and non-deterministic ordering (e.g., scorer_mock.py).
+• data/ — test_data.json and any fixtures for submissions.
+• tests/ — automated test harness for pre-fix behavior (e.g., test_pre_flaky.py) that runs repeated and concurrent submissions to reproduce non-determinism.
+• logs/ — captured logs from pre-fix runs (log_pre_flaky.txt) including request traces and mock scorer logs.
+• performance/ — timing/latency files (time_pre_flaky.txt).
+• requirements.txt — Python dependencies for Project A.
+• setup.sh — environment setup script for Project A.
+• run_tests.sh — one-command script to run Project A tests (start service & mocks, run repeated tests, collect logs/results).
+Project B – Post-Fix (Deterministic Implementation) — folder name: Project_B_Deterministic
+• src/ — corrected grading pipeline implementation (e.g., grading_service.py) implementing determinism: idempotent scorer calls, ordered aggregation, proper retry with idempotency keys, or use of deterministic reduce/commit step.
+• mocks/ — same scorer mocks used to validate behavior under identical stimulus.
+• data/ — test_data.json and expected_postfix_responses.json.
+• tests/ — automated test harness for post-fix behavior (e.g., test_post_deterministic.py) verifying deterministic outputs across repeated runs.
+• logs/ — captured logs from post-fix runs (log_post_deterministic.txt).
+• performance/ — timing/latency files (time_post_deterministic.txt).
+• requirements.txt — Python dependencies for Project B.
+• setup.sh — environment setup script for Project B.
+• run_tests.sh — one-command script to run Project B tests and collect artifacts.
+Shared Artifacts (at repo root)
+• test_data.json — canonical set of ≥5 structured test cases (normal, concurrency, retry/failure, malformed, race-prone).
+• compare_report.md — comprehensive comparison report containing: pre-fix flakiness evidence, post-fix determinism proof, side-by-side metrics table (inconsistency_count, flakiness_rate, score_variance, avg_latency_before/after, retry_counts, throughput), sample request/response traces, and conclusions/recommendations.
+• run_all.sh — master script to sequentially run the full experiment: set up envs, run Project A tests, run Project B tests, aggregate results_pre.json and results_post.json, and produce compare_report.md.
+• results/ — aggregated structured results (e.g., results_pre.json, results_post.json, aggregated_metrics.json).
+• README.md — instructions: how to run run_all.sh, how to run each project individually, how to interpret logs/metrics, how to vary mock conditions, and limitations.
+________________________________________
+Goal
+Provide two fully runnable, reproducible project folders demonstrating a concrete Flaky behavior (non-deterministic exam scoring due to asynchronous/race conditions) and its mitigation. Deliver comprehensive automated tests and scripts that prove Project B reduces/eliminates output variance and flakiness while maintaining acceptable performance. Produce logs, statistical comparisons, and a final report quantifying the improvement and documenting limitations and recommended architectural and operational practices (idempotency, deterministic aggregation, bounded retries, observability).
+Use this specification to implement the experiments, generate deterministic mocks, automated stress and repeat tests, environment scripts, logs and structured results so the effect of fixes on flaky behavior can be validated reproducibly and quantitatively.
